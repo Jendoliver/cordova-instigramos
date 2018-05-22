@@ -11,6 +11,8 @@ class Picture
     private $user;
     private $uri;
     private $hashtags;
+    private $likes;
+    private $dislikes;
 
     public function __construct() { }
     public static function create()                 { $instance = new self(); return $instance; }
@@ -19,11 +21,15 @@ class Picture
     public function getUser(): string               { return $this->user; }
     public function getUri(): string                { return $this->uri; }
     public function getHashtags(): array            { return $this->hashtags; }
+    public function getLikes(): int                 { return $this->likes; }
+    public function getDislikes(): int              { return $this->dislikes; }
 
     // Setters
     public function setUser(string $newUser)        { $this->user = $newUser; return $this; }
     public function setUri(string $newUri)          { $this->uri = $newUri; return $this; }
     public function setHashtags(array $newHashtags) { $this->hashtags = $newHashtags; return $this; }
+    public function setLikes(int $newLikes)         { $this->likes = $newLikes; return $this; }
+    public function setDislikes(int $newDislikes)   { $this->dislikes = $newDislikes; return $this; }
 
     public function addHashtag(string $hashtag)
     {

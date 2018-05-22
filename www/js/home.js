@@ -60,6 +60,7 @@ function changePassword()
                 alert("There was an error while changing your password");
         }
     });
+    $("#changePasswordModal").modal("hide");
 }
 
 function loadImages()
@@ -80,14 +81,59 @@ function loadImages()
 
                 for(let i in images)
                 {
-                    var newImage = $("<div class='gallery_product col-lg-4 col-md-4 col-sm-4 col-xs-5 filter'><img src='http://fakeimg.pl/365x365/' class='img-fluid'/></div>");;
-                    newImage.find('.img-fluid').attr("src", images[i].uri);
+                    var newImage = $("<div class='gallery_product col-lg-4 col-md-4 col-sm-4 col-xs-5 filter'>" +
+                        "<img src='"+images[i].uri+"' class='img-fluid'/>" +
+                        "  <div class=\"btn-group mr-2\" role=\"group\" aria-label=\"Rate\">" +
+                        "    <button name='"+images[i].id+"' type=\"button\" class=\"btn btn-secondary like\">Like ("+images[i].likes+")</button>" +
+                        "    <button name='"+images[i].id+"' type=\"button\" class=\"btn btn-secondary unrate\">Remove rating</button>" +
+                        "    <button name='"+images[i].id+"' type=\"button\" class=\"btn btn-secondary dislike\">Dislike ("+images[i].dislikes+")</button>" +
+                        "  </div>" +
+                        "</div>");
                     if(images[i].user === localStorage.getItem("username"))
                         newImage.addClass("yours");
                     else
                         newImage.addClass("others");
                     imagesDiv.append(newImage);
                 }
+
+                // Prepare like/dislike actions
+                $(".like").click(likeImage);
+                $(".unrate").click(unrateImage);
+                $(".dislike").click(dislikeImage);
+            }
+        }
+    });
+}
+
+function likeImage()
+{
+    rateImage($(this).attr("name"), 1);
+}
+
+function unrateImage()
+{
+    rateImage($(this).attr("name"), 0);
+}
+
+function dislikeImage()
+{
+    rateImage($(this).attr("name"), -1);
+}
+
+function rateImage(pictureid, rating)
+{
+    $.ajax({
+        method: "POST",
+        url: WS + "service/ajax/rate_picture.php",
+        data: { username: localStorage.getItem("username"),
+            pictureid: pictureid,
+            rating: rating},
+        success: function(response)
+        {
+            if(response !== "false")
+            {
+                loadImages();
+                alert("Rating updated!");
             }
         }
     });
@@ -159,10 +205,10 @@ function uploadPhoto()
     options.fileName=uploadImgUri.substr(uploadImgUri.lastIndexOf('/')+1);
     options.params = params;
 
-    fileTransfer.upload(uploadImgUri, encodeURI(WS + "service/ajax/upload_picture.php"), win, fail, options);
+    fileTransfer.upload(uploadImgUri, encodeURI(WS + "service/ajax/upload_picture.php"), uploadSuccess, uploadFail, options);
 }
 
-function win(r)
+function uploadSuccess(r)
 {
     console.log("Code = " + r.responseCode);
     console.log("Response = " + r.response);
@@ -171,7 +217,7 @@ function win(r)
     $("#uploadImageModal").modal("hide");
 }
 
-function fail(error)
+function uploadFail(error)
 {
     alert("An error has occurred: Code = " + error.code);
     console.log("upload error source " + error.source);

@@ -147,15 +147,23 @@ class InstagramoDAO
         {
             $picture = Picture::create()
                 ->setUser($row["uploader_username"])
-                ->setUri($row["uri"]);
+                ->setUri($row["uri"])
+                ->setLikes($this->getRating($row["id"], true))
+                ->setDislikes($this->getRating($row["id"], false));
 
-            $pictures[] = array('user' => $picture->getUser(), 'uri' => $picture->getUri());
+            $pictures[] = array(
+                'id' => $row["id"],
+                'user' => $picture->getUser(),
+                'uri' => $picture->getUri(),
+                'likes' => $picture->getLikes(),
+                'dislikes' => $picture->getDislikes());
         }
 
         $con->close();
         return $pictures;
     }
 
+    // TODO enable its use in the view via search bar
     public function findPicturesWithHashtag(string $hashtag)
     {
         $con = $this->connect();
@@ -169,10 +177,65 @@ class InstagramoDAO
         while ($row = $res->fetch_assoc())
         {
             $pictures[] = Picture::create()->setUser(User::create()->setUsername($row["uploader_username"]))
-                ->setUri($row["uri"]);
+                ->setUri($row["uri"])
+                ->setLikes($this->getRating($row["id"], true))
+                ->setDislikes($this->getRating($row["id"], false));
         }
         $con->close();
         return $pictures;
+    }
+
+    public function getRating(int $pictureid, bool $likes)
+    {
+        $con = $this->connect();
+        $query = "SELECT count(*) AS num FROM user_rates_picture 
+                    WHERE picture_id = $pictureid AND rating = ".($likes ? 1 : -1).";";
+        $res = $con->query($query);
+
+        $count = 0;
+        if ($row = $res->fetch_assoc())
+            $count = $row["num"];
+        $con->close();
+        return $count;
+    }
+
+    public function getUserRating(User $user, int $pictureid)
+    {
+        $con = $this->connect();
+        $query = "SELECT rating FROM user_rates_picture 
+                    WHERE rater_username = '".$user->getUsername()."' 
+                    AND picture_id = $pictureid";
+        $res = $con->query($query);
+
+        $con->close();
+        if($res->num_rows > 0)
+        {
+            $row = $res->fetch_assoc();
+            return $row["rating"];
+        }
+        return -69;
+    }
+
+    public function rate(User $user, int $pictureid, int $rating): bool
+    {
+        $con = $this->connect();
+        $existingRating = $this->getUserRating($user, $pictureid);
+        if($existingRating == -69)
+        {
+            $query = "INSERT INTO user_rates_picture VALUES ('".$user->getUsername()."', $pictureid, $rating)";
+        }
+        else
+        {
+            $query = "UPDATE user_rates_picture SET rating = $rating WHERE rater_username = '".$user->getUsername()."' AND picture_id = $pictureid";
+        }
+
+        if($con->query($query))
+        {
+            $con->close();
+            return true;
+        }
+        $con->close();
+        return false;
     }
 
     private function connect(): mysqli
