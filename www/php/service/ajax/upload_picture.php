@@ -7,7 +7,6 @@
  */
 
 require '../../model/InstagramoDAO.php';
-require '../../model/Picture.php';
 
 if (!isset($_FILES["file"]["type"]))
 {
@@ -39,13 +38,12 @@ if ( !isset($_POST["hashtags"]) )
 }
 
 $hashtags = json_decode($_POST['hashtags']);
-$uploaderUser = User::create()->setUsername($_POST["username"]);
-$picture = Picture::create()->setUser($uploaderUser)->setHashtags($hashtags);
+$picture = Picture::create()->setUser($_POST["username"])->setHashtags($hashtags);
 $fileName = Picture::generateRandomFileName();
 $picturePath = "uploads/$fileName.$fileExtension";
 $picture->setUri("https://instigramos.000webhostapp.com/$picturePath");
 var_dump($hashtags);
-var_dump($uploaderUser); // TODO change session by local storage
+var_dump($uploaderUser);
 var_dump($picture);
 
 print_r($hashtags);

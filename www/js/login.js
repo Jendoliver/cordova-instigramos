@@ -33,7 +33,7 @@ function showFeedback( text )
 
 function trySessionLogin()
 {
-    if(localStorage.getItem("username") != null)
+    if(localStorage.getItem("username") !== "")
         window.location.href = "home.html";
 }
 

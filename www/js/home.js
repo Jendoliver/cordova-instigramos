@@ -17,7 +17,11 @@ $(document).ready(function()
     }
     $(this).addClass("active");
 
+    // Load all images
+    loadImages();
+
     // Prepare picture events
+    $("#everything").click(loadImages);
     $("#takepic").click(takePicture);
     $("#selectpic").click(loadImageFromGallery)
 
@@ -26,6 +30,37 @@ $(document).ready(function()
 
     $("#logout").click(logout);
 });
+
+function loadImages()
+{
+    let imagesDiv = $(".images");
+    imagesDiv.empty();
+
+    $.ajax({
+        method: "POST",
+        url: WS + "service/ajax/find_all_pictures.php",
+        success: function(response)
+        {
+            if(response !== "false")
+            {
+                console.log(response);
+                let images = JSON.parse(response);
+                console.log(images);
+
+                for(let i in images)
+                {
+                    var newImage = $("<div class='gallery_product col-lg-4 col-md-4 col-sm-4 col-xs-5 filter'><img src='http://fakeimg.pl/365x365/' class='img-fluid'/></div>");;
+                    newImage.find('.img-fluid').attr("src", images[i].uri);
+                    if(images[i].user === localStorage.getItem("username"))
+                        newImage.addClass("yours");
+                    else
+                        newImage.addClass("others");
+                    imagesDiv.append(newImage);
+                }
+            }
+        }
+    });
+}
 
 function filterImages()
 {
@@ -114,13 +149,6 @@ function fail(error)
 
 function logout()
 {
-    $.ajax({
-        method: "POST",
-        url: WS + "service/ajax/logout.php",
-        success: function(response)
-        {
-            if(response === "true")
-                window.location.href = "login.html";
-        }
-    });
+    localStorage.setItem("username", "");
+    window.location.href = "login.html";
 }

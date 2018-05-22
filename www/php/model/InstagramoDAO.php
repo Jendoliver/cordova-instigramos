@@ -7,6 +7,7 @@
  */
 
 require 'User.php';
+require 'Picture.php';
 
 class InstagramoDAO
 {
@@ -55,7 +56,7 @@ class InstagramoDAO
         $query = "INSERT INTO picture VALUES ("
             .$pictureId.", '"
             .$picture->getUri()."', '"
-            .$picture->getUser()->getUsername()."');";
+            .$picture->getUser()."');";
         if( ! $con->query($query))
         {
             $con->close();
@@ -100,14 +101,43 @@ class InstagramoDAO
         return 0;
     }
 
-    public function findPictures()
+    public function findPictures(): array
     {
-        // TODO finish
+        $con = $this->connect();
+        $query = "SELECT * FROM picture;";
+        $res = $con->query($query);
+
+        $pictures = array();
+        while ($row = $res->fetch_assoc())
+        {
+            $picture = Picture::create()
+                ->setUser($row["uploader_username"])
+                ->setUri($row["uri"]);
+
+            $pictures[] = array('user' => $picture->getUser(), 'uri' => $picture->getUri());
+        }
+
+        $con->close();
+        return $pictures;
     }
 
     public function findPicturesWithHashtag(string $hashtag)
     {
+        $con = $this->connect();
+        $query = "SELECT * FROM picture WHERE id IN (
+                    SELECT picture_id FROM picture_has_hashtag
+                    WHERE hashtag = $hashtag
+                  );";
+        $res = $con->query($query);
 
+        $pictures = array();
+        while ($row = $res->fetch_assoc())
+        {
+            $pictures[] = Picture::create()->setUser(User::create()->setUsername($row["uploader_username"]))
+                ->setUri($row["uri"]);
+        }
+        $con->close();
+        return $pictures;
     }
 
     private function connect(): mysqli
