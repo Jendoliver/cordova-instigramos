@@ -21,7 +21,7 @@ if (
         ($_FILES["file"]["type"] == "image/png")
         || ($_FILES["file"]["type"] == "image/jpg")
         || ($_FILES["file"]["type"] == "image/jpeg")
-    ) || !($_FILES["file"]["size"] < 100000)
+    ) || !($_FILES["file"]["size"] < 1000000)
     || !(in_array($fileExtension, $validExtensions))
 ) //Approx. 100kb files can be uploaded.
 {

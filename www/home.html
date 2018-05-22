@@ -35,6 +35,9 @@
                 <li class="nav-item">
                     <a id="selectpic" class="nav-link" href="#">Select pic</a>
                 </li>
+                <li class="nav-item">
+                    <a id="changePasswordOption" class="nav-link" href="#">Change password</a>
+                </li>
 
                 <li class="my-2 my-lg-0 dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -96,7 +99,30 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button id="uploadImage" type="button" class="btn btn-primary">Upload</button>
+                    <button id="uploadImage" type="button" class="btn btn-primary">Change</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change password Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordTitle">Change your password!</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="changePasswordForm" role="form" action="javascript:void(0);">
+                        <div class="form-group">
+                            New password:
+                            <input type="text" maxlength="20" name="newPassword" id="newPassword" tabindex="1" class="form-control" placeholder="New password..." value="">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="changePassword" type="button" class="btn btn-primary">Upload</button>
                 </div>
             </div>
         </div>

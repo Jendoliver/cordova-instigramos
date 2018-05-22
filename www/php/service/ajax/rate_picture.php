@@ -3,9 +3,10 @@
  * Created by PhpStorm.
  * User: Jandol
  * Date: 05/22/2018
- * Time: 15:39
+ * Time: 19:07
  */
 require '../../model/InstagramoDAO.php';
 
 $instagramoDAO = new InstagramoDAO();
-echo json_encode($instagramoDAO->findPicturesWithHashtag($_POST["hashtag"]));
+$couldRate = $instagramoDAO->rate(User::create()->setUsername($_POST["username"]), $_POST["pictureid"], $_POST["rating"]);
+echo $couldRate;

@@ -2,6 +2,9 @@ let WS = "https://instigramos.000webhostapp.com/";
 
 $(document).ready(function()
 {
+    // Clear quickphoto cache on init
+    localStorage.setItem("quickphoto", "");
+
     trySessionLogin();
 
     $('#login-form-link').click(function(e)
@@ -24,7 +27,54 @@ $(document).ready(function()
 
     $("#login-submit").click(submitLogin);
     $("#register-submit").click(submitRegister);
+
+    // Examen
+    $("#searchAllUsers").click(loadAllUsers);
+    $("#quickPhoto").click(quickPhoto);
 });
+
+function loadAllUsers()
+{
+    var usersTable = $("#allUsers");
+    usersTable.empty();
+
+    $.ajax({
+        method: "POST",
+        url: WS + "service/ajax/find_all_users.php",
+        success: function(response)
+        {
+            if(response !== "false")
+            {
+                console.log(response);
+                let users = JSON.parse(response);
+                console.log(users);
+
+                for(let i in users)
+                {
+                    usersTable.append($("<tr><td>"+users[i].username+"</td><td>"+users[i].email+"</td></tr>"));
+                }
+            }
+        }
+    });
+}
+
+function quickPhoto()
+{
+    // Retrieve image file location from specified source
+    navigator.camera.getPicture(savePhotoForQuickLoading,
+        function(message) { alert('Picture cancelled'); },
+        { quality: 50,
+            destinationType: navigator.camera.DestinationType.FILE_URI,
+            sourceType: navigator.camera.PictureSourceType.CAMERA }
+    );
+}
+
+function savePhotoForQuickLoading(imageURI)
+{
+    uploadImgUri = imageURI;
+    $("#quickPhotoImage").attr("src", imageURI);
+    localStorage.setItem("quickphoto", imageURI);
+}
 
 function showFeedback( text )
 {
