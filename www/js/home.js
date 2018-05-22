@@ -9,6 +9,20 @@ $(document).ready(function()
     if(localStorage.getItem("username") == null)
         window.location.href = "login.html";
 
+    // Examen (quick photo)
+    if(localStorage.getItem("quickphoto") !== "")
+    {
+        askPhotoHashtags(localStorage.getItem("quickphoto"));
+        // After quickphoto recovery, we get rid of the cache
+        localStorage.setItem("quickphoto", "");
+    }
+
+    // Examen (change password)
+    $("#changePasswordOption").click(function () {
+        $("#changePasswordModal").modal("show");
+    });
+    $("#changePassword").click(changePassword);
+
     // Prepare gallery filter
     let filterBtn = $(".filter-button");
     filterBtn.click(filterImages);
@@ -30,6 +44,23 @@ $(document).ready(function()
 
     $("#logout").click(logout);
 });
+
+function changePassword()
+{
+    $.ajax({
+        type: "POST",
+        url: WS + "service/ajax/change_password.php",
+        data: { username: localStorage.getItem("username"),
+            newPassword: $("#newPassword").val() },
+        success: function(response)
+        {
+            if(response === "true")
+                alert("Password changed successfully!");
+            else
+                alert("There was an error while changing your password");
+        }
+    });
+}
 
 function loadImages()
 {

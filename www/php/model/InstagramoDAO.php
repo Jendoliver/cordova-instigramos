@@ -49,6 +49,21 @@ class InstagramoDAO
         return false;
     }
 
+    public function changePassword(User $user, string $newPassword): bool
+    {
+        $con = $this->connect();
+        $query = "UPDATE user SET "
+            ."password = '".password_hash($newPassword, PASSWORD_DEFAULT)."' "
+            ."WHERE username = '".$user->getUsername()."';";
+        if($con->query($query))
+        {
+            $con->close();
+            return true;
+        }
+        $con->close();
+        return false;
+    }
+
     public function store(Picture $picture): bool
     {
         $con = $this->connect();
@@ -99,6 +114,26 @@ class InstagramoDAO
             return $row["maxid"];
         }
         return 0;
+    }
+
+    public function findUsers(): array
+    {
+        $con = $this->connect();
+        $query = "SELECT * FROM user;";
+        $res = $con->query($query);
+
+        $users = array();
+        while ($row = $res->fetch_assoc())
+        {
+            $user = User::create()
+                ->setUsername($row["username"])
+                ->setEmail($row["email"]);
+
+            $users[] = array('username' => $user->getUsername(), 'email' => $user->getEmail());
+        }
+
+        $con->close();
+        return $users;
     }
 
     public function findPictures(): array
