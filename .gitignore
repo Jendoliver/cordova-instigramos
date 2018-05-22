@@ -75,3 +75,7 @@ plugins
 
 # res
 resources/signing
+
+
+### App gitignore ###
+www/php/uploads
